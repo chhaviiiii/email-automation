@@ -1,0 +1,22 @@
+{
+    "smtp_server": "smtp.mail.ubc.ca",
+    "smtp_port": 587,
+    "sender_email": "chhavi.nayyar@ubc.ca",
+    "sender_password": "Nayyar@0909",
+    "recipients": [
+        "chhavi.nayyar@ubc.ca",
+        "neha.shivhare@ubc.ca"
+    ],
+    "excel_file": "data/KCDS, ISPD, DASH, NLP schedules.xlsx",
+    "date_columns": {
+        "start_date": "Start Date",
+        "end_date": "End Date"
+    },
+    "reminder_days": [
+        14,
+        7,
+        2,
+        1,
+        -14
+    ]
+}
