@@ -117,3 +117,105 @@
 2025-10-05 18:02:15,369 - INFO - Sent 1 reminders today
 2025-10-05 18:02:15,369 - INFO - Daily check completed. Sent 1 reminders.
 2025-10-05 18:02:15,369 - INFO - Email reminder check completed successfully!
+Traceback (most recent call last):
+  File "/Users/chhavinayyar/email-automation/run_reminder.py", line 7, in <module>
+    from email_reminder_system import EmailReminderSystem
+  File "/Users/chhavinayyar/email-automation/email_reminder_system.py", line 7, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+Traceback (most recent call last):
+  File "/Users/chhavinayyar/email-automation/run_reminder.py", line 7, in <module>
+    from email_reminder_system import EmailReminderSystem
+  File "/Users/chhavinayyar/email-automation/email_reminder_system.py", line 7, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+Traceback (most recent call last):
+  File "/Users/chhavinayyar/email-automation/run_reminder.py", line 7, in <module>
+    from email_reminder_system import EmailReminderSystem
+  File "/Users/chhavinayyar/email-automation/email_reminder_system.py", line 7, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+Traceback (most recent call last):
+  File "/Users/chhavinayyar/email-automation/run_reminder.py", line 7, in <module>
+    from email_reminder_system import EmailReminderSystem
+  File "/Users/chhavinayyar/email-automation/email_reminder_system.py", line 7, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+Traceback (most recent call last):
+  File "/Users/chhavinayyar/email-automation/run_reminder.py", line 7, in <module>
+    from email_reminder_system import EmailReminderSystem
+  File "/Users/chhavinayyar/email-automation/email_reminder_system.py", line 7, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+Traceback (most recent call last):
+  File "/Users/chhavinayyar/email-automation/run_reminder.py", line 7, in <module>
+    from email_reminder_system import EmailReminderSystem
+  File "/Users/chhavinayyar/email-automation/email_reminder_system.py", line 7, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+Traceback (most recent call last):
+  File "/Users/chhavinayyar/email-automation/run_reminder.py", line 7, in <module>
+    from email_reminder_system import EmailReminderSystem
+  File "/Users/chhavinayyar/email-automation/email_reminder_system.py", line 7, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+Traceback (most recent call last):
+  File "/Users/chhavinayyar/email-automation/run_reminder.py", line 7, in <module>
+    from email_reminder_system import EmailReminderSystem
+  File "/Users/chhavinayyar/email-automation/email_reminder_system.py", line 7, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+Traceback (most recent call last):
+  File "/Users/chhavinayyar/email-automation/run_reminder.py", line 7, in <module>
+    from email_reminder_system import EmailReminderSystem
+  File "/Users/chhavinayyar/email-automation/email_reminder_system.py", line 7, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+Traceback (most recent call last):
+  File "/Users/chhavinayyar/email-automation/run_reminder.py", line 7, in <module>
+    from email_reminder_system import EmailReminderSystem
+  File "/Users/chhavinayyar/email-automation/email_reminder_system.py", line 7, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+Traceback (most recent call last):
+  File "/Users/chhavinayyar/email-automation/run_reminder.py", line 7, in <module>
+    from email_reminder_system import EmailReminderSystem
+  File "/Users/chhavinayyar/email-automation/email_reminder_system.py", line 7, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+Traceback (most recent call last):
+  File "/Users/chhavinayyar/email-automation/run_reminder.py", line 7, in <module>
+    from email_reminder_system import EmailReminderSystem
+  File "/Users/chhavinayyar/email-automation/email_reminder_system.py", line 7, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+Traceback (most recent call last):
+  File "/Users/chhavinayyar/email-automation/run_reminder.py", line 7, in <module>
+    from email_reminder_system import EmailReminderSystem
+  File "/Users/chhavinayyar/email-automation/email_reminder_system.py", line 7, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+2025-10-19 19:53:57,814 - INFO - Starting email reminder check...
+2025-10-19 19:53:57,815 - INFO - Starting daily reminder check...
+2025-10-19 19:53:57,973 - INFO - Loaded 64 records from Excel file
+2025-10-19 19:54:05,522 - INFO - Email sent successfully to 1 recipients
+2025-10-19 19:54:05,522 - INFO - Sent 2_days_before reminder for Data Visualization
+2025-10-19 19:54:05,527 - INFO - Sent 1 reminders today
+2025-10-19 19:54:05,527 - INFO - Daily check completed. Sent 1 reminders.
+2025-10-19 19:54:05,527 - INFO - Email reminder check completed successfully!
+2025-10-19 19:54:09,742 - INFO - Starting email reminder check...
+2025-10-19 19:54:09,742 - INFO - Starting daily reminder check...
+2025-10-19 19:54:09,800 - INFO - Loaded 64 records from Excel file
+2025-10-19 19:54:10,534 - INFO - Email sent successfully to 1 recipients
+2025-10-19 19:54:10,534 - INFO - Sent 2_days_before reminder for Data Visualization
+2025-10-19 19:54:10,536 - INFO - Sent 1 reminders today
+2025-10-19 19:54:10,536 - INFO - Daily check completed. Sent 1 reminders.
+2025-10-19 19:54:10,536 - INFO - Email reminder check completed successfully!
+2025-10-19 19:58:49,317 - INFO - Starting email reminder check...
+2025-10-19 19:58:49,318 - INFO - Starting daily reminder check...
+2025-10-19 19:58:49,403 - INFO - Loaded 64 records from Excel file
+2025-10-19 19:58:50,727 - INFO - Email sent successfully to 2 recipients
+2025-10-19 19:58:50,727 - INFO - Sent 2_days_before reminder for Data Visualization
+2025-10-19 19:58:50,731 - INFO - Sent 1 reminders today
+2025-10-19 19:58:50,731 - INFO - Daily check completed. Sent 1 reminders.
+2025-10-19 19:58:50,731 - INFO - Email reminder check completed successfully!
