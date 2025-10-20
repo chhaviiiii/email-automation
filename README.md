@@ -2,16 +2,16 @@
 
 An automated email reminder system that sends calendar invitations and course reminders based on Excel schedule data. Perfect for academic institutions, training programs, and event management.
 
-## ✨ Features
+## Features
 
-- **📅 Calendar Integration**: Generate and send professional calendar invites (.ics files)
-- **🔔 Automated Reminders**: Send email reminders at multiple intervals (14 days, 7 days, 2 days, 1 day before, and 14 days after)
-- **📊 Excel Data Processing**: Automatically process course schedules from Excel files
-- **🤖 Daily Automation**: Runs automatically via cron job or continuous monitoring
-- **📧 Professional Emails**: Well-formatted emails with detailed instructions
-- **🔒 Secure Configuration**: Sensitive data excluded from version control
+- **Calendar Integration**: Generate and send professional calendar invites (.ics files)
+- **Automated Reminders**: Send email reminders at multiple intervals (14 days, 7 days, 2 days, 1 day before, and 14 days after)
+- **Excel Data Processing**: Automatically process course schedules from Excel files
+- **Daily Automation**: Runs automatically via cron job or continuous monitoring
+- **Professional Emails**: Well-formatted emails with detailed instructions
+- **Secure Configuration**: Sensitive data excluded from version control
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -195,7 +195,7 @@ Check logs:
 tail -f email_reminder.log
 ```
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch
