@@ -2,81 +2,76 @@
 
 {% macro csrf() %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endmacro %}
 
-{% macro icon(name) -%}
-<svg class="icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor"
-     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  {%- if name == 'book' -%}<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5v14z"/><path d="M6.5 17A2.5 2.5 0 0 0 4 19.5 2.5 2.5 0 0 0 6.5 22H20v-5"/>
-  {%- elif name == 'clock' -%}<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>
-  {%- elif name == 'calendar' -%}<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
-  {%- elif name == 'send' -%}<path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/>
-  {%- elif name == 'users' -%}<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/>
-  {%- elif name == 'search' -%}<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>
-  {%- elif name == 'mail' -%}<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/>
-  {%- elif name == 'settings' -%}<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>
-  {%- elif name == 'info' -%}<circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/>
-  {%- endif -%}
-</svg>
-{%- endmacro %}
-
-{% macro course_card(item, show_owner=false) %}
+{% macro course_block(item, show_owner=false) %}
 {% set c = item.course %}
-<article class="card course">
-  <div class="course-head">
-    <div class="course-title">
-      <h3>{{ c.title or c.course_code }}</h3>
-      <div class="chips">
-        {% if show_owner %}<span class="chip chip-owner">Owner: {{ c.owner }}</span>{% endif %}
-        <span class="chip">Program: {{ c.program or 'N/A' }}</span>
-        <span class="chip">To: {{ c.recipients }}</span>
-        <span class="chip">Reminders: {{ c.offsets }} before</span>
-        {% if c.url %}<a href="{{ c.url }}" target="_blank" rel="noopener" class="chip chip-link">Course page ↗</a>{% endif %}
-      </div>
+<article class="course">
+  <header class="course-head">
+    <div>
+      <h3>
+        {% if c.url %}<a href="{{ c.url }}" target="_blank" rel="noopener">{{ c.title or c.course_code }}</a>
+        {% else %}{{ c.title or c.course_code }}{% endif %}
+        <span class="code">{{ c.course_code }}</span>
+      </h3>
+      <p class="course-meta">
+        {% if show_owner %}<span>Owner: {{ c.owner }}</span>{% endif %}
+        <span>Program: {{ c.program or 'N/A' }}</span>
+        <span>To: {{ c.recipients }}</span>
+        <span>Reminders: {{ c.offsets }} before</span>
+      </p>
     </div>
     <div class="course-actions">
-      <details class="inline-edit">
-        <summary class="button small-btn">Edit</summary>
-        <form method="post" action="{{ url_for('edit_course', code=c.course_code) }}" class="edit-form">
-          {{ csrf() }}<input type="hidden" name="owner" value="{{ c.owner }}">
-          <label>Send to <small>(comma-separated)</small><input name="recipients" value="{{ c.recipients }}"></label>
-          <label>Remind <small>(e.g. 14d, 7d, 2d, 1d)</small><input name="offsets" value="{{ c.offsets }}"></label>
-          <label>Program <small>(shown in the email)</small><input name="program" value="{{ c.program }}"></label>
-          <button class="primary">Save changes</button>
-        </form>
-      </details>
+      <button type="button" class="text-button" aria-expanded="false"
+              onclick="toggleEdit(this)">Edit</button>
       <form method="post" action="{{ url_for('remove_course', code=c.course_code) }}" class="inline"
-            onsubmit="return confirm('Stop reminders for this course?')">
+            onsubmit="return confirm('Stop all reminders for this course?')">
         {{ csrf() }}<input type="hidden" name="owner" value="{{ c.owner }}">
-        <button class="danger small-btn">Remove</button>
+        <button class="text-button danger">Remove</button>
       </form>
     </div>
-  </div>
+  </header>
+
+  <form method="post" action="{{ url_for('edit_course', code=c.course_code) }}" class="edit-form" hidden>
+    {{ csrf() }}<input type="hidden" name="owner" value="{{ c.owner }}">
+    <label>Send to<input name="recipients" value="{{ c.recipients }}"></label>
+    <label>Reminders<input name="offsets" value="{{ c.offsets }}"></label>
+    <label>Program name in email<input name="program" value="{{ c.program }}"></label>
+    <div class="edit-buttons">
+      <button class="primary">Save</button>
+      <button type="button" class="secondary" onclick="toggleEdit(this.closest('.course').querySelector('[aria-expanded]'))">Cancel</button>
+    </div>
+  </form>
+
   {% if item.sessions %}
-  <ul class="session-list">
+  <table class="sessions">
+    <colgroup><col class="c-when"><col class="c-code"><col class="c-next"><col class="c-act"></colgroup>
+    <thead><tr><th>Session</th><th>Section</th><th>Next reminder</th><th><span class="sr-only">Actions</span></th></tr></thead>
+    <tbody>
     {% for s in item.sessions %}
     {% set e = s.event %}
-    <li class="session-row">
-      <div class="session-when">
-        <span class="session-dates">{{ e | daterange }}</span>
-        <span class="code-pill">{{ e.source_key }}</span>
-      </div>
-      <div class="session-status">
+    <tr>
+      <td class="nowrap">{{ e | daterange }}</td>
+      <td class="muted">{{ e.source_key }}</td>
+      <td>
         {% if s.failed %}
-          <span class="pill pill-failed">Email failed</span>
-          <form method="post" action="{{ url_for('retry_reminder', reminder_id=s.failed[0].id) }}" class="inline">{{ csrf() }}<button class="link-button">Retry</button></form>
+          <span class="status-failed">Failed to send</span>
+          <form method="post" action="{{ url_for('retry_reminder', reminder_id=s.failed[0].id) }}" class="inline">{{ csrf() }}<button class="text-button">Retry</button></form>
         {% elif s.next %}
-          <span class="pill pill-next">Next email · {{ s.next.send_at | dt }}</span>
+          {{ s.next.send_at | day }}, {{ s.next.send_at | time12 }}
         {% else %}
-          <span class="pill pill-muted">No more emails</span>
+          <span class="muted">None left</span>
         {% endif %}
-        {% if s.sent %}<span class="pill pill-sent">{{ s.sent }} sent</span>{% endif %}
-      </div>
-      <form method="post" action="{{ url_for('remove_session', event_id=e.id) }}" class="inline session-skip"
-            onsubmit="return confirm('Skip reminders for this session only?')">{{ csrf() }}<button class="link-button subtle">Skip session</button></form>
-    </li>
+        {% if s.sent %}<span class="muted"> · {{ s.sent }} sent</span>{% endif %}
+      </td>
+      <td class="right">
+        <form method="post" action="{{ url_for('remove_session', event_id=e.id) }}" class="inline"
+              onsubmit="return confirm('Stop reminders for this session only?')">{{ csrf() }}<button class="text-button muted">Skip</button></form>
+      </td>
+    </tr>
     {% endfor %}
-  </ul>
+    </tbody>
+  </table>
   {% else %}
-  <p class="no-sessions">{{ icon('info') }} No upcoming dates posted yet. Reminders start automatically when Extended Learning posts them.</p>
+  <p class="muted small">No dates posted yet. Reminders start once Extended Learning lists a session.</p>
   {% endif %}
 </article>
 {% endmacro %}
@@ -84,138 +79,99 @@
 {% block content %}
 
 {% if email_problem and admin %}
-<form method="post" action="{{ url_for('save_settings') }}" class="card setup">
+<form method="post" action="{{ url_for('save_settings') }}" class="setup">
   {{ csrf() }}
   {% if email_problem == 'missing' %}
-    <strong>Set up sending: enter the UBC email password for {{ settings.sender_email }}</strong>
-    <p>Until this is set, no reminder emails go out and other people can't get sign-in codes.</p>
+    <h2>Set up sending</h2>
+    <p>Enter the UBC email password for {{ settings.sender_email }}. Until then, no reminders go out and nobody else can sign in.</p>
   {% else %}
-    <strong>Emails aren't sending</strong>
-    <p class="error-text">{{ email_problem }}</p>
+    <h2>Emails aren't sending</h2>
+    <p class="status-failed">{{ email_problem }}</p>
     <p>If the CWL password for {{ settings.sender_email }} changed, enter the new one.</p>
   {% endif %}
-  <div class="row">
+  <div class="inline-fields">
     <label class="sr-only" for="setup-password">UBC email password</label>
-    <input id="setup-password" type="password" name="smtp_password" placeholder="UBC email password" autocomplete="current-password" required>
-    <button name="action" value="save" class="primary">Save and send a test email</button>
+    <input id="setup-password" type="password" name="smtp_password" placeholder="Password" autocomplete="current-password" required>
+    <button name="action" value="save" class="primary">Save and send test email</button>
   </div>
 </form>
 {% elif email_problem %}
-<div class="flash warning">Reminder emails are paused for the moment. They'll go out once sending is fixed.</div>
+<div class="notice warning">Reminder emails are paused for now. They'll go out once sending is fixed.</div>
 {% endif %}
 
-<div class="page-head">
-  <div>
-    <h1>Hi{{ ', ' ~ user.split('@')[0].split('.')[0] | capitalize if user }}</h1>
-    <p class="muted">{{ 'Here’s everything that’s scheduled across all users.' if admin else 'Here’s what’s scheduled for your courses.' }}</p>
-  </div>
-</div>
-
-<section class="stats" aria-label="Summary">
-  <div class="stat">
-    <div class="stat-top"><span class="stat-icon">{{ icon('book') }}</span><span class="stat-label">Courses followed</span></div>
-    <div><span class="stat-num">{{ stats.courses }}</span></div>
-  </div>
-  <div class="stat">
-    <div class="stat-top"><span class="stat-icon">{{ icon('clock') }}</span><span class="stat-label">Emails scheduled</span></div>
-    <div><span class="stat-num">{{ stats.scheduled }}</span></div>
-  </div>
-  <div class="stat">
-    <div class="stat-top"><span class="stat-icon">{{ icon('calendar') }}</span><span class="stat-label">Next email</span></div>
-    <div>
-      {% if stats.next %}<span class="stat-num stat-small">{{ stats.next | day }}</span><span class="stat-sub">{{ stats.next | time12 }}</span>
-      {% else %}<span class="stat-num">—</span>{% endif %}</div>
-  </div>
-  <div class="stat">
-    <div class="stat-top"><span class="stat-icon">{{ icon('send') }}</span><span class="stat-label">Emails sent</span></div>
-    <div><span class="stat-num">{{ stats.sent }}</span></div>
-  </div>
-  {% if admin %}
-  <div class="stat">
-    <div class="stat-top"><span class="stat-icon">{{ icon('users') }}</span><span class="stat-label">People using it</span></div>
-    <div><span class="stat-num">{{ people }}</span></div>
-  </div>
+<section class="overview" aria-label="Summary">
+  {% set nd = stats.next_detail %}
+  <p class="overview-label">Next reminder:</p>
+  {% if nd %}
+    <p class="overview-next"><strong>{{ nd.send_at | day }} at {{ nd.send_at | time12 }}</strong></p>
+    <p class="overview-what">{{ nd.title }} <span class="muted">· {{ nd.offset_label }}</span></p>
+  {% else %}
+    <p class="overview-next">Nothing scheduled yet</p>
   {% endif %}
+  <p class="overview-counts">
+    <span>{{ stats.courses }} course{{ '' if stats.courses == 1 else 's' }}</span>
+    <span>{{ stats.scheduled }} email{{ '' if stats.scheduled == 1 else 's' }} scheduled</span>
+    <span>{{ stats.sent }} sent</span>
+    {% if admin %}<span>{{ people }} {{ 'person' if people == 1 else 'people' }} using it</span>{% endif %}
+  </p>
 </section>
 
-<details class="card guide" {{ 'open' if not my_courses }}>
-  <summary>{{ icon('info') }} Getting started</summary>
-  <ol class="step-list">
-    <li><span class="step-num">1</span><div><strong>Choose who gets the emails and when.</strong> Under <em>Add courses</em>,
-      enter the email addresses (yours is filled in) and the reminder times, e.g. <code>14d, 7d, 2d, 1d</code> = 14, 7, 2
-      and 1 days before the course starts.</div></li>
-    <li><span class="step-num">2</span><div><strong>Search and tick courses.</strong> Type a course name or number,
-      e.g. "health data" or "0115".</div></li>
-    <li><span class="step-num">3</span><div><strong>Click Add courses.</strong> That's it. Reminders go out automatically
-      from {{ settings.sender_email }}.</div></li>
+{% if not my_courses %}
+<section class="intro">
+  <h2>Getting started</h2>
+  <ol>
+    <li>Under <strong>Add courses</strong>, check who the emails go to and when.</li>
+    <li>Search for a course and tick it.</li>
+    <li>Click <strong>Add</strong>. Emails go out automatically from {{ settings.sender_email }}.</li>
   </ol>
-  <p class="muted small">Afterwards, manage everything under <em>Your courses</em>: <strong>Edit</strong> changes recipients,
-    timing or the program name in the email, <strong>Remove</strong> stops a course, and <strong>Skip session</strong> stops one session.</p>
-</details>
+</section>
+{% endif %}
 
 <section class="section" aria-labelledby="your-courses">
-  <div class="section-head">
-    <h2 id="your-courses">Your courses {% if my_courses %}<span class="count">{{ my_courses | length }}</span>{% endif %}</h2>
-    <p class="section-help">Courses you get reminders for, each upcoming session, and when its next email goes out.</p>
-  </div>
+  <h2 id="your-courses" class="section-title">Your courses</h2>
   {% if not my_courses %}
-    <div class="card empty">
-      <span class="empty-icon">{{ icon('mail') }}</span>
-      <strong>No courses yet</strong>
-      <p>Add a course below and reminder emails will go out automatically.</p>
-      <a class="button primary" href="#add">Add your first course</a>
-    </div>
+    <p class="muted">Nothing here yet. Courses you add below will show up here with their reminder dates.</p>
   {% endif %}
-  {% for item in my_courses %}{{ course_card(item) }}{% endfor %}
+  {% for item in my_courses %}{{ course_block(item) }}{% endfor %}
 </section>
 
 <section class="section" aria-labelledby="add">
-  <div class="section-head">
-    <h2 id="add">Add courses</h2>
-    <p class="section-help">Set who gets the emails and when, tick the courses you want, then click <strong>Add courses</strong>.
-      Reminders turn on right away, and new sessions of those courses are added automatically.</p>
-  </div>
+  <h2 id="add" class="section-title">Add courses</h2>
 {% if not available and not my_courses %}
-  <div class="card empty">
-    {% if syncing %}<meta http-equiv="refresh" content="10"><strong>Loading courses from Extended Learning…</strong><p>This takes a minute or two.</p>
-    {% elif admin %}<form method="post" action="{{ url_for('refresh_courses') }}">{{ csrf() }}<button class="primary">Load courses</button></form>
-    {% else %}<strong>The course list is being prepared</strong><p>Please check back soon.</p>{% endif %}
-  </div>
+  {% if syncing %}<meta http-equiv="refresh" content="10"><p>Loading courses from Extended Learning. This takes a minute or two.</p>
+  {% elif admin %}<form method="post" action="{{ url_for('refresh_courses') }}">{{ csrf() }}<button class="primary">Load courses</button></form>
+  {% else %}<p class="muted">The course list is being prepared. Please check back soon.</p>{% endif %}
 {% else %}
 <form method="post" action="{{ url_for('add_courses') }}" id="add-form">
   {{ csrf() }}
-  <div class="card add-bar sticky">
-    <label>Send to <small>(comma-separated emails)</small><input name="recipients" value="{{ user }}"></label>
-    <label>Remind <small>(before the start date)</small><input name="offsets" value="{{ settings.default_offsets }}"></label>
-    <button class="primary" id="add-button">Add courses</button>
-    <p class="hint">Reminder times: <code>14d</code> = 14 days before the course starts, <code>1w</code> = 1 week,
-      <code>2h</code> = 2 hours. Separate with commas. Add <code>after</code> for a follow-up once it ends, e.g. <code>14d after</code>.</p>
+  <div class="add-controls">
+    <label class="grow">Send to<input name="recipients" value="{{ user }}"></label>
+    <label>Reminders<input name="offsets" value="{{ settings.default_offsets }}"></label>
+    <button class="primary" id="add-button">Add</button>
   </div>
-  <div class="card picker">
-    <div class="picker-head">
-      <label for="course-search">Search and tick courses</label>
-      <span class="selected-count" id="selected-count" hidden></span>
-    </div>
-    <div class="search-box">
-      {{ icon('search') }}
-      <input type="search" id="course-search" placeholder="Search by course name or number, e.g. health data or 0115">
+  <p class="hint">Separate emails with commas. <code>14d</code> means 14 days before the start date; you can also use
+    <code>1w</code>, <code>2h</code>, or <code>14d after</code> for a follow-up once the course ends.</p>
+
+  <div class="picker">
+    <div class="picker-top">
+      <label for="course-search" class="sr-only">Search courses</label>
+      <input type="search" id="course-search" placeholder="Search by name or number, e.g. health data or 0115">
+      <span class="muted small" id="selected-count" aria-live="polite"></span>
     </div>
     <div id="course-list" role="group" aria-label="Courses">
       {% for item in available %}
       {% set c = item.course %}
-      <label class="course-option" data-search="{{ (c.title ~ ' ' ~ c.code ~ ' ' ~ c.program) | lower }}"
+      <label class="option" data-search="{{ (c.title ~ ' ' ~ c.code ~ ' ' ~ c.program) | lower }}"
              data-upcoming="{{ 1 if item.sessions else 0 }}">
         <input type="checkbox" name="course" value="{{ c.code }}">
-        <span class="option-body">
-          <span class="option-title">{{ c.title }} <span class="code-pill">{{ c.code }}</span></span>
-          <span class="option-meta">
-            {% if item.sessions %}Next: {{ item.sessions[0] | daterange }}{% if item.sessions|length > 1 %} · +{{ item.sessions|length - 1 }} more{% endif %}
-            {% else %}No dates posted yet{% endif %}{% if c.program %} · {{ c.program }}{% endif %}
-          </span>
+        <span class="option-title">{{ c.title }} <span class="code">{{ c.code }}</span></span>
+        <span class="option-date">
+          {% if item.sessions %}{{ item.sessions[0] | daterange }}{% if item.sessions|length > 1 %} <span class="muted">+{{ item.sessions|length - 1 }}</span>{% endif %}
+          {% else %}<span class="muted">No dates yet</span>{% endif %}
         </span>
       </label>
       {% endfor %}
-      <p class="muted center" id="no-results" hidden>No courses match your search.</p>
+      <p class="muted small empty-results" id="no-results" hidden>No courses match that search.</p>
     </div>
   </div>
 </form>
@@ -225,40 +181,43 @@
 {% if admin %}
 {% if others %}
 <section class="section" aria-labelledby="others">
-  <div class="section-head">
-    <h2 id="others">Everyone else's courses <span class="count">{{ others | length }}</span></h2>
-    <p class="section-help">Admin view: courses other people follow. You can edit or remove them.</p>
-  </div>
-  {% for item in others %}{{ course_card(item, show_owner=true) }}{% endfor %}
+  <h2 id="others" class="section-title">Everyone else's courses</h2>
+  {% for item in others %}{{ course_block(item, show_owner=true) }}{% endfor %}
 </section>
 {% endif %}
 
-<details class="card settings" id="settings">
-  <summary>{{ icon('settings') }} Settings <span class="muted small">(admin only)</span></summary>
+<details class="section settings" id="settings">
+  <summary class="section-title">Settings</summary>
   <form method="post" action="{{ url_for('save_settings') }}">
     {{ csrf() }}
-    <p class="muted">All reminder and sign-in emails are sent from <strong>{{ settings.sender_email }}</strong>.
-      {% if settings.catalog_synced_at %}Course list updated {{ settings.catalog_synced_at | dt }}.{% endif %}</p>
-    <div class="grid">
+    <p class="muted small">Emails are sent from {{ settings.sender_email }}.
+      {% if settings.catalog_synced_at %}Course list last updated {{ settings.catalog_synced_at | dt }}.{% endif %}</p>
+    <div class="settings-fields">
       <label>Default reminders<input name="offsets" value="{{ settings.default_offsets }}"></label>
       <label>Send emails at<input type="time" name="all_day_send_time" value="{{ settings.all_day_send_time }}"></label>
-      <label class="span-2">UBC email password <small>(leave blank to keep the current one)</small>
-        <input type="password" name="smtp_password" autocomplete="new-password"></label>
+      <label>UBC email password<input type="password" name="smtp_password" autocomplete="new-password" placeholder="Unchanged"></label>
     </div>
-    <div class="actions">
+    <div class="button-row">
       <button name="action" value="save" class="primary">Save</button>
-      <button name="action" value="test" formnovalidate>Send me a test email</button>
-      <button formaction="{{ url_for('refresh_courses') }}" formnovalidate>Update course list now</button>
+      <button name="action" value="test" class="secondary" formnovalidate>Send test email</button>
+      <button formaction="{{ url_for('refresh_courses') }}" class="secondary" formnovalidate>Update course list</button>
     </div>
   </form>
 </details>
 {% endif %}
 
 <script>
+function toggleEdit(button) {
+  const form = button.closest('.course').querySelector('.edit-form');
+  const open = form.hidden;
+  form.hidden = !open;
+  button.setAttribute('aria-expanded', String(open));
+  if (open) form.querySelector('input:not([type=hidden])').focus();
+}
 (() => {
   const search = document.getElementById('course-search');
   if (!search) return;
-  const options = [...document.querySelectorAll('.course-option')];
+  const options = [...document.querySelectorAll('.option')];
   const noResults = document.getElementById('no-results');
   const button = document.getElementById('add-button');
   const counter = document.getElementById('selected-count');
@@ -274,15 +233,10 @@
   }
   function count() {
     let n = 0;
-    for (const o of options) {
-      const on = o.querySelector('input').checked;
-      o.classList.toggle('selected', on);
-      if (on) n++;
-    }
-    button.textContent = n ? `Add ${n} course${n === 1 ? '' : 's'}` : 'Add courses';
+    for (const o of options) if (o.querySelector('input').checked) n++;
+    button.textContent = n ? `Add ${n} course${n === 1 ? '' : 's'}` : 'Add';
     button.disabled = n === 0;
-    counter.hidden = n === 0;
-    counter.textContent = `${n} selected`;
+    counter.textContent = n ? `${n} selected` : '';
   }
   search.addEventListener('input', filter);
   document.getElementById('add-form').addEventListener('change', count);

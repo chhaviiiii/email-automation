@@ -334,8 +334,13 @@ def summary(conn, owner=None):
         "MIN(CASE WHEN r.status = 'pending' AND e.status = 'active' THEN r.send_at END) AS next_send "
         f"FROM reminders r JOIN events e ON e.id = r.event_id {where}", params,
     ).fetchone()
+    upcoming = conn.execute(
+        "SELECT r.send_at, r.offset_label, e.title FROM reminders r JOIN events e ON e.id = r.event_id "
+        f"{where} {'AND' if owner else 'WHERE'} r.status = 'pending' AND e.status = 'active' "
+        "ORDER BY r.send_at LIMIT 1", params,
+    ).fetchone()
     return {"courses": follows, "scheduled": row["scheduled"] or 0, "sent": row["sent"] or 0,
-            "next": row["next_send"]}
+            "next": row["next_send"], "next_detail": upcoming}
 
 
 def can_manage(owner):

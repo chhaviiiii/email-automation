@@ -1,91 +1,71 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="login-layout">
-  <section class="card intro">
-    <p class="eyebrow">UBC Extended Learning</p>
-    <h1>Never miss a course start date</h1>
-    <p class="lead">Course Reminders sends automatic email reminders before
-      <a href="https://extendedlearning.ubc.ca/courses-programs/our-courses" target="_blank" rel="noopener">UBC Extended Learning</a>
-      courses start. Pick the courses you care about, choose who should be reminded and when, and the emails go out
-      on their own from <strong>chhavi.nayyar@ubc.ca</strong>.</p>
-
-    <h2>How it works</h2>
-    <ol class="step-list">
-      <li><span class="step-num">1</span><div><strong>Sign in with your UBC email.</strong>
-        We email you a one-time code. No password to remember.</div></li>
-      <li><span class="step-num">2</span><div><strong>Pick your courses.</strong>
-        Search the Extended Learning catalogue and tick the courses you want.</div></li>
-      <li><span class="step-num">3</span><div><strong>Reminders go out automatically.</strong>
-        By default 14, 7, 2 and 1 days before each session starts. New sessions and date changes are picked up daily.</div></li>
-    </ol>
-
-    <div class="help-box">
-      <strong>Need help?</strong> Contact Chhavi Nayyar at <a href="mailto:chhavi.nayyar@ubc.ca">chhavi.nayyar@ubc.ca</a>.
+<div class="signin">
+  {% if pending %}
+    <h1>Check your email</h1>
+    <p class="lead">We sent a 6-digit code to <strong>{{ pending }}</strong>.</p>
+    <p class="muted small">It can take a minute to arrive, so check your junk folder too. You can also click the link in the email.</p>
+    <form method="post" action="{{ url_for('login_verify') }}" class="signin-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label for="code">Code</label>
+      <input id="code" class="code-input" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="7"
+             pattern="[0-9 ]*" placeholder="000000" required autofocus>
+      <button class="primary wide">Sign in</button>
+    </form>
+    <div class="signin-links">
+      <form method="post" action="{{ url_for('login_resend') }}" class="inline">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="text-button">Resend code</button>
+      </form>
+      <form method="post" action="{{ url_for('login_restart') }}" class="inline">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="text-button">Change email</button>
+      </form>
     </div>
-  </section>
+    <p class="muted small">{{ 'You’ll stay signed in on this device for 90 days.' if pending_remember else 'You’ll be signed out when you close your browser.' }}</p>
+  {% else %}
+    <h1>Sign in</h1>
+    <p class="lead">Course Reminders emails you before the UBC Extended Learning courses you care about start.</p>
 
-  <section class="card login" aria-labelledby="signin-title">
-    {% if pending %}
-      <h2 id="signin-title" class="card-title">Check your email</h2>
-      <div class="sent-to">
-        <span class="muted small">We sent a 6-digit code to</span>
-        <strong>{{ pending }}</strong>
-      </div>
-      <p class="muted small">Enter it below, or click the link in the email. It can take a minute to arrive; check your junk folder too.</p>
-      <form method="post" action="{{ url_for('login_verify') }}">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <label for="code">Sign-in code</label>
-        <input id="code" class="code-input" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="7"
-               pattern="[0-9 ]*" placeholder="123456" required autofocus>
-        <button class="primary wide">Sign in</button>
-      </form>
-      <div class="link-row">
-        <form method="post" action="{{ url_for('login_resend') }}" class="inline">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <button class="link-button">Resend code</button>
-        </form>
-        <span aria-hidden="true">·</span>
-        <form method="post" action="{{ url_for('login_restart') }}" class="inline">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <button class="link-button">Change email</button>
-        </form>
-      </div>
-      <p class="muted small center">{{ 'You’ll stay signed in on this device for 90 days.' if pending_remember else 'You’ll be signed out when you close your browser.' }}</p>
-    {% else %}
-      <h2 id="signin-title" class="card-title">Sign in</h2>
-      {% if email_ready %}
-      <form method="post" action="{{ url_for('login_send') }}">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <label for="email">Your UBC email</label>
-        <input id="email" type="email" name="email" value="{{ last_email }}" placeholder="you@{{ domains[0] }}"
-               autocomplete="email" required {{ '' if last_email else 'autofocus' }}>
-        {% if last_email %}
-        <p class="field-note">Not you? <a href="{{ url_for('login_forget') }}">Use a different email</a></p>
-        {% endif %}
-        <label class="check">
-          <input type="checkbox" name="remember" checked> Remember me on this device
-        </label>
-        <button class="primary wide" {{ 'autofocus' if last_email }}>Email me a sign-in code</button>
-      </form>
-      <p class="muted small">Use your {{ '@' ~ domains | join(', @') }} address (including subdomains such as @student.ubc.ca).
-        You'll only see and manage your own reminders.</p>
-      {% else %}
-      <div class="flash warning">Email sign-in isn't switched on yet. Please check back soon.</div>
+    {% if email_ready %}
+    <form method="post" action="{{ url_for('login_send') }}" class="signin-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label for="email">UBC email</label>
+      <input id="email" type="email" name="email" value="{{ last_email }}" placeholder="you@{{ domains[0] }}"
+             autocomplete="email" required {{ '' if last_email else 'autofocus' }}>
+      {% if last_email %}
+      <p class="field-note">Not you? <a href="{{ url_for('login_forget') }}">Use a different email</a></p>
       {% endif %}
+      <label class="check"><input type="checkbox" name="remember" checked> Remember me on this device</label>
+      <button class="primary wide" {{ 'autofocus' if last_email }}>Email me a sign-in code</button>
+    </form>
+    <p class="muted small">No password needed. Use your {{ '@' ~ domains | join(', @') }} address. You'll only see your own reminders.</p>
+    {% else %}
+    <div class="notice warning">Email sign-in isn't switched on yet. Please check back soon.</div>
     {% endif %}
 
-    {% if admin_login and not pending %}
-    <details class="admin-login" {{ 'open' if not email_ready }}>
-      <summary>Administrator sign-in</summary>
-      <form method="post" action="{{ url_for('login_admin') }}">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <label for="admin-password">Administrator password</label>
-        <input id="admin-password" type="password" name="password" autocomplete="current-password" required>
-        <label class="check"><input type="checkbox" name="remember" checked> Remember me on this device</label>
-        <button>Sign in as administrator</button>
-      </form>
-    </details>
-    {% endif %}
-  </section>
+    <section class="how">
+      <h2>How it works</h2>
+      <ol>
+        <li>Sign in with your UBC email. We send you a one-time code.</li>
+        <li>Pick the courses you want reminders for.</li>
+        <li>Emails go out automatically from chhavi.nayyar@ubc.ca, by default 14, 7, 2 and 1 days before each session starts.</li>
+      </ol>
+      <p class="muted small">Need help? Contact Chhavi Nayyar at <a href="mailto:chhavi.nayyar@ubc.ca">chhavi.nayyar@ubc.ca</a>.</p>
+    </section>
+  {% endif %}
+
+  {% if admin_login and not pending %}
+  <details class="admin-signin" {{ 'open' if not email_ready }}>
+    <summary>Administrator sign-in</summary>
+    <form method="post" action="{{ url_for('login_admin') }}" class="signin-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label for="admin-password">Password</label>
+      <input id="admin-password" type="password" name="password" autocomplete="current-password" required>
+      <label class="check"><input type="checkbox" name="remember" checked> Remember me on this device</label>
+      <button class="secondary wide">Sign in as administrator</button>
+    </form>
+  </details>
+  {% endif %}
 </div>
 {% endblock %}

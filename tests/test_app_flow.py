@@ -230,7 +230,7 @@ def test_add_course_turns_reminders_on(client):
     page = client.get("/").get_data(as_text=True)
     assert f'name="recipients" value="{ADMIN}"' in page
     assert page.index('id="add-button"') < page.index('id="course-search"')
-    assert "Getting started" in page and "<details class=\"card guide\" open>" in page
+    assert "Getting started" in page and '<section class="intro">' in page
     resp = client.post("/courses/add", data={"course": ["0115"], "recipients": "me@ubc.ca, team@ubc.ca",
                                              "offsets": "14d, 2d"}, follow_redirects=True)
     page = resp.get_data(as_text=True)
@@ -323,8 +323,8 @@ def test_dashboard_summary_counts(client):
     sign_in_as(client, "pat@ubc.ca")
     client.post("/courses/add", data={"course": ["0115"], "recipients": "pat@ubc.ca", "offsets": "7d, 1d"})
     page = client.get("/").get_data(as_text=True)
-    nums = re.findall(r'class="stat-num[^"]*">([^<]+)<', page)
-    assert nums[0] == "1" and nums[1] == "4" and nums[3] == "0"
+    assert "<span>1 course</span>" in page and "<span>4 emails scheduled</span>" in page
+    assert "<span>0 sent</span>" in page and "Next reminder:" in page and "Health Data and Visualization" in page
 
 
 # --- Migration ------------------------------------------------------------------------------------
