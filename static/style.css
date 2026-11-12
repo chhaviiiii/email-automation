@@ -129,8 +129,7 @@ table.el-table { width: 100%; border-collapse: collapse; table-layout: fixed; fo
 table.sessions { width: 100%; border-collapse: collapse; margin: 4px 0 14px; font-size: 14px; background: #fff; }
 .sessions th { text-align: left; font-size: 13px; font-weight: 700; color: var(--navy); padding: 6px 10px; border-bottom: 2px solid var(--navy); }
 .sessions td { padding: 7px 10px; border-bottom: 1px solid var(--row-rule); }
-.edit-form { display: grid; grid-template-columns: 2fr 1.2fr 1.4fr auto; gap: 10px; align-items: end; }
-.remove-form { margin-top: 10px; font-size: 13.5px; }
+.remove-form { margin-top: 2px; font-size: 13.5px; }
 
 /* Refine rows */
 .refine { display: flex; align-items: flex-end; gap: 16px; margin-bottom: 10px; }
@@ -177,7 +176,6 @@ table.sessions { width: 100%; border-collapse: collapse; margin: 4px 0 14px; fon
   .refine label, .refine .grow { width: 100%; flex: 1 1 100%; }
   .refine .btn { width: 100%; }
   .hint { margin-left: 0; }
-  .edit-form { grid-template-columns: 1fr; }
   .c-session, .courses th:nth-child(3), .courses tbody.course > tr.row > td:nth-child(3) { display: none; }
   .c-name { width: 48%; } .c-next { width: 30%; } .c-more { width: 22%; }
   .c-format, .picker th:nth-child(3), .picker td:nth-child(3) { display: none; }

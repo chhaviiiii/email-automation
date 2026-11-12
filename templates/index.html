@@ -58,13 +58,6 @@
         </table>
         {% endif %}
 
-        <form method="post" action="{{ url_for('edit_course', code=c.course_code) }}" class="edit-form">
-          {{ csrf() }}<input type="hidden" name="owner" value="{{ c.owner }}">
-          <label>Send to<input name="recipients" value="{{ c.recipients }}"></label>
-          <label>Reminders<input name="offsets" value="{{ c.offsets }}"></label>
-          <label>Program name in email<input name="program" value="{{ c.program }}"></label>
-          <button class="btn">Save changes</button>
-        </form>
         <form method="post" action="{{ url_for('remove_course', code=c.course_code) }}" class="remove-form"
               onsubmit="return confirm('Stop all reminders for this course?')">
           {{ csrf() }}<input type="hidden" name="owner" value="{{ c.owner }}">

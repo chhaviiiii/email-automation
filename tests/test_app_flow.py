@@ -246,7 +246,7 @@ def test_add_course_turns_reminders_on(client):
                                              "offsets": "14d, 2d"}, follow_redirects=True)
     page = resp.get_data(as_text=True)
     assert "Reminders are on for Health Data and Visualization (2 upcoming sessions)" in page
-    assert 'name="program" value="Health Data"' in page and page.count("Program: Health Data") == 0
+    assert 'name="program"' not in page and "Save changes" not in page
 
     with client.db.get_db() as conn:
         events = conn.execute("SELECT * FROM events ORDER BY start_date").fetchall()
@@ -285,7 +285,7 @@ def test_users_only_see_and_manage_their_own_courses(client):
     assert counts == {"pat@ubc.ca": 2, "sam@ubc.ca": 2}
 
     page = client.get("/").get_data(as_text=True)
-    assert "sam-team@ubc.ca" in page and "pat-team@ubc.ca" not in page
+    assert 'name="owner" value="sam@ubc.ca"' in page and 'name="owner" value="pat@ubc.ca"' not in page
     assert client.post("/courses/0115/edit", data={"owner": "pat@ubc.ca", "recipients": "x@ubc.ca",
                                                    "offsets": "1d"}).status_code == 403
     assert client.post("/courses/0115/remove", data={"owner": "pat@ubc.ca"}).status_code == 403
