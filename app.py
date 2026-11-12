@@ -43,6 +43,9 @@ app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 app.secret_key = db.get_settings()["secret_key"]
 app.config.update(
+    # Not "session": browsers can still hold an older "session" cookie with different attributes, and sending
+    # both makes the server read the stale one, which silently breaks sign-in.
+    SESSION_COOKIE_NAME="cr_session",
     SESSION_COOKIE_HTTPONLY=True,
     # Inside a WordPress iframe the site is third-party, so on HTTPS the cookie must be SameSite=None.
     SESSION_COOKIE_SAMESITE="None" if ON_FLY else "Lax",
@@ -78,6 +81,7 @@ def protect():
     if request.method == "POST" and app.config["CSRF_ENABLED"] and request.endpoint != "health":
         sent = request.form.get("csrf_token", "")
         if not session.get("csrf") or not hmac.compare_digest(sent, session["csrf"]):
+            logger.warning("Rejected %s: missing or stale form token (cookie not kept by browser?)", request.path)
             flash("Your browser didn't keep you signed in on this page. Try again, or open Course Reminders "
                   "in its own tab.", "error")
             return redirect(url_for("index" if current_user() else "login"))

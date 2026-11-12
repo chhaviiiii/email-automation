@@ -72,6 +72,17 @@ def test_pages_need_sign_in(client):
     assert "Sign in" in page and "How it works" in page and "mailto:chhavi.nayyar@ubc.ca" in page
 
 
+def test_sign_in_survives_stale_session_cookie(client):
+    enable_email(client)
+    client.app.app.config["CSRF_ENABLED"] = True
+    client.set_cookie("session", "eyJ1c2VyIjpudWxsfQ.stale.cookie")
+    page = client.get("/login").get_data(as_text=True)
+    token = re.search(r'name="csrf_token" value="([^"]+)"', page).group(1)
+    page = client.post("/login/send", data={"csrf_token": token, "email": "pat@ubc.ca", "remember": "on"},
+                       follow_redirects=True).get_data(as_text=True)
+    assert "We sent a 6-digit code to" in page and len(client.sent) == 1
+
+
 def test_email_code_sign_in(client):
     page = client.get("/login").get_data(as_text=True)
     assert "isn't switched on yet" in page and "Administrator sign-in" in page
@@ -127,7 +138,7 @@ def test_code_attempts_and_requests_are_limited(client):
 
 
 def session_cookie(resp):
-    return next(c for c in resp.headers.getlist("Set-Cookie") if c.startswith("session="))
+    return next(c for c in resp.headers.getlist("Set-Cookie") if c.startswith("cr_session="))
 
 
 def sign_in_with_code(client, email, remember):
