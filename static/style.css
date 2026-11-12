@@ -73,6 +73,9 @@ button { font: inherit; cursor: pointer; }
 .link { background: none; border: 0; padding: 0; color: var(--navy); text-decoration: underline; text-underline-offset: 2px; font-size: inherit; }
 .link:hover { color: var(--blue); }
 .link.danger:hover { color: var(--red); }
+.btn-remove { height: 30px; padding: 0 12px; border: 1px solid var(--field); background: #fff; color: var(--text);
+  font-size: 13px; font-weight: 600; border-radius: 0; margin-top: -5px; }
+.btn-remove:hover { border-color: var(--red); color: var(--red); }
 
 /* Notices */
 .notice { border-left: 4px solid var(--navy); background: var(--stripe); padding: 10px 14px; margin-bottom: 18px; font-size: 14px; }
@@ -116,7 +119,7 @@ table.el-table { width: 100%; border-collapse: collapse; table-layout: fixed; fo
 .picker tr[hidden], .courses tr[hidden] { display: none; }
 .picker tbody tr { cursor: pointer; }
 
-.c-toggle { width: 44px; } .c-name { width: 42%; } .c-session { width: 25%; } .c-next { width: 22%; } .c-more { width: 11%; }
+.c-toggle { width: 44px; } .c-name { width: 38%; } .c-session { width: 23%; } .c-next { width: 20%; } .c-more { width: 9%; } .c-remove { width: 10%; }
 .owner { font-weight: 400; color: var(--muted); font-size: 13px; margin-top: 2px; }
 .picker .c-name { width: 46%; } .c-format { width: 14%; } .c-date { width: 18%; }
 
@@ -129,7 +132,6 @@ table.el-table { width: 100%; border-collapse: collapse; table-layout: fixed; fo
 table.sessions { width: 100%; border-collapse: collapse; margin: 4px 0 14px; font-size: 14px; background: #fff; }
 .sessions th { text-align: left; font-size: 13px; font-weight: 700; color: var(--navy); padding: 6px 10px; border-bottom: 2px solid var(--navy); }
 .sessions td { padding: 7px 10px; border-bottom: 1px solid var(--row-rule); }
-.remove-form { margin-top: 2px; font-size: 13.5px; }
 
 /* Refine rows */
 .refine { display: flex; align-items: flex-end; gap: 16px; margin-bottom: 10px; }
@@ -177,7 +179,8 @@ table.sessions { width: 100%; border-collapse: collapse; margin: 4px 0 14px; fon
   .refine .btn { width: 100%; }
   .hint { margin-left: 0; }
   .c-session, .courses th:nth-child(3), .courses tbody.course > tr.row > td:nth-child(3) { display: none; }
-  .c-name { width: 48%; } .c-next { width: 30%; } .c-more { width: 22%; }
+  .c-name { width: 42%; } .c-next { width: 26%; } .c-more { width: 0; } .c-remove { width: 24%; }
+  .courses th:nth-child(5), .courses tbody.course > tr.row > td:nth-child(5) { display: none; }
   .c-format, .picker th:nth-child(3), .picker td:nth-child(3) { display: none; }
   .picker .c-name { width: 52%; } .c-date { width: 28%; }
   .el-table > tbody > tr > td, .el-table > tbody.course > tr > td { padding: 10px 8px; }

@@ -4,9 +4,9 @@
 
 {% macro course_table(items, show_owner=false) %}
 <table class="el-table courses">
-  <colgroup><col class="c-toggle"><col class="c-name"><col class="c-session"><col class="c-next"><col class="c-more"></colgroup>
+  <colgroup><col class="c-toggle"><col class="c-name"><col class="c-session"><col class="c-next"><col class="c-more"><col class="c-remove"></colgroup>
   <thead>
-    <tr><th><span class="sr-only">Expand</span></th><th>Course name</th><th>Next session</th><th>Next reminder</th><th>More</th></tr>
+    <tr><th><span class="sr-only">Expand</span></th><th>Course name</th><th>Next session</th><th>Next reminder</th><th>More</th><th><span class="sr-only">Remove</span></th></tr>
   </thead>
   {% for item in items %}
   {% set c = item.course %}
@@ -27,10 +27,17 @@
         {% else %}<span class="muted">None</span>{% endif %}
       </td>
       <td>{% if c.url %}<a href="{{ c.url }}" target="_blank" rel="noopener">Details</a>{% endif %}</td>
+      <td class="right">
+        <form method="post" action="{{ url_for('remove_course', code=c.course_code) }}" class="inline"
+              onsubmit="return confirm('Remove {{ (c.title or c.course_code) | replace("'", "") }}? No more reminders will be sent for it.')">
+          {{ csrf() }}<input type="hidden" name="owner" value="{{ c.owner }}">
+          <button class="btn-remove">Remove</button>
+        </form>
+      </td>
     </tr>
     <tr class="details" hidden>
       <td></td>
-      <td colspan="4">
+      <td colspan="5">
 
         {% if sessions %}
         <table class="sessions">
@@ -58,11 +65,6 @@
         </table>
         {% endif %}
 
-        <form method="post" action="{{ url_for('remove_course', code=c.course_code) }}" class="remove-form"
-              onsubmit="return confirm('Stop all reminders for this course?')">
-          {{ csrf() }}<input type="hidden" name="owner" value="{{ c.owner }}">
-          <button class="link danger">Stop all reminders for this course</button>
-        </form>
       </td>
     </tr>
   </tbody>
