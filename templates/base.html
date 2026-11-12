@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Course Reminders · UBC Extended Learning</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script>if (window.self !== window.top) document.documentElement.classList.add('embedded');</script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="ubc-header">
+    <div class="ubc-wordmark"><div class="wrap">The University of British Columbia</div></div>
+    <div class="unit-bar">
+      <div class="wrap unit-inner">
+        <a class="unit-name" href="{{ url_for('index') }}">
+          <span class="unit-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          </span>
+          <span>
+            <span class="unit-title">Course Reminders</span>
+            <span class="unit-sub">UBC Extended Learning</span>
+          </span>
+        </a>
+        {% if user %}
+        <div class="who">
+          <span class="avatar" aria-hidden="true">{{ user[0] | upper }}</span>
+          <span class="who-email">{{ user }}{% if admin %} <span class="badge admin">Admin</span>{% endif %}</span>
+          <form method="post" action="{{ url_for('logout') }}" class="inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="ghost small-btn">Sign out</button>
+          </form>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+  <main class="wrap" id="main">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash {{ category }}" role="{{ 'alert' if category == 'error' else 'status' }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <span>Course Reminders for UBC Extended Learning · emails are sent from chhavi.nayyar@ubc.ca</span>
+      <span>Questions? Contact Chhavi Nayyar, <a href="mailto:chhavi.nayyar@ubc.ca">chhavi.nayyar@ubc.ca</a></span>
+    </div>
+  </footer>
+  <script>
+  (() => {
+    if (window.self === window.top) return;
+    const post = () => parent.postMessage({type: 'course-reminders-height', height: document.documentElement.scrollHeight}, '*');
+    window.addEventListener('load', post);
+    if (window.ResizeObserver) new ResizeObserver(post).observe(document.body);
+  })();
+  </script>
+</body>
+</html>

@@ -1,219 +1,87 @@
-# 📧 Email Automation System
+# Course Reminders
 
-An automated email reminder system that sends calendar invitations and course reminders based on Excel schedule data. Perfect for academic institutions, training programs, and event management.
+Pick UBC Extended Learning courses and reminder emails go out automatically from
+`chhavi.nayyar@ubc.ca`.
 
-## Features
+Live at **https://chhavi-reminders.fly.dev**
 
-- **Calendar Integration**: Generate and send professional calendar invites (.ics files)
-- **Automated Reminders**: Send email reminders at multiple intervals (14 days, 7 days, 2 days, 1 day before, and 14 days after)
-- **Excel Data Processing**: Automatically process course schedules from Excel files
-- **Daily Automation**: Runs automatically via cron job or continuous monitoring
-- **Professional Emails**: Well-formatted emails with detailed instructions
-- **Secure Configuration**: Sensitive data excluded from version control
+## Signing in
 
-## Quick Start
+Anyone with a UBC email (`@ubc.ca`, including subdomains such as `@student.ubc.ca`; change with the
+`ALLOWED_EMAIL_DOMAINS` env var) signs in with a one-time code or link emailed from the sender address.
+Each person sees and manages only their own courses, and their reminders default to their own email.
+Admins (`ADMIN_EMAILS`, default `chhavi.nayyar@ubc.ca`) also see everyone's courses and the Settings, and
+can sign in with the `APP_PASSWORD` secret under "Administrator sign-in" (needed before email works).
 
-### Prerequisites
+## WordPress (UBC CMS)
 
-- Python 3.7 or higher
-- SMTP email account (Outlook, Gmail, etc.)
-- Excel file with course schedule data
+The site can be embedded in `*.ubc.ca` pages (`FRAME_ANCESTORS` env var). Paste
+`wordpress-embed.html` into a Custom HTML block. If UBC CMS strips the iframe, the snippet's button
+still links to the site.
 
-### Installation
+## Using it
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/chhaviiiii/email-automation.git
-   cd email-automation
-   ```
+Everything is on one page:
 
-2. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+- **Your courses:** the courses you get reminders for, each upcoming session, and when the next email
+  goes out. **Edit** changes who gets the emails, when, and the program name. **Remove** stops
+  reminders for the course; **skip** stops them for one session.
+- **Add courses:** search the Extended Learning catalogue, tick courses, choose who to send to and when
+  (default 14, 7, 2 and 1 days before the start date), and click **Add**. Reminders are on immediately.
+  New sessions of your courses are picked up automatically, and if Extended Learning changes a session's
+  dates the reminders move with it. The course list is refreshed daily.
+- **Settings:** default recipients and reminder times, the time of day emails go out (9:00 AM), and the
+  UBC email password. Saving the password sends you a test email.
 
-3. **Configure email settings:**
-   - Copy `email_config.json.example` to `email_config.json`
-   - Update with your email credentials and recipients
+Reminder times are written like `14d, 7d, 2d, 1d` (d = days, w = weeks, h = hours). Add `after` for a
+follow-up after the course ends, e.g. `14d after`.
 
-4. **Add your Excel schedule file:**
-   - Place your course schedule Excel file in the `data/` directory
-   - Update the `excel_file` path in `email_config.json`
+Each email looks like this:
 
-## 📋 Configuration
+```
+Subject: Course Reminder: Health Data and Visualization
 
-### Email Configuration (`email_config.json`)
+Dear Team,
 
-```json
-{
-    "smtp_server": "smtp.mail.ubc.ca",
-    "smtp_port": 587,
-    "sender_email": "your_email@domain.com",
-    "sender_password": "your_password",
-    "recipients": [
-        "recipient1@domain.com",
-        "recipient2@domain.com"
-    ],
-    "excel_file": "data/your_schedule.xlsx",
-    "date_columns": {
-        "start_date": "Start Date",
-        "end_date": "End Date"
-    },
-    "reminder_days": [14, 7, 2, 1, -14]
-}
+This is a reminder that Health Data and Visualization is starting in 2 days.
+
+Course Details:
+- Course: Health Data and Visualization
+- Program: Health Data
+- Start Date: 2025-10-07
+- End Date: 2025-11-10
 ```
 
-### Excel File Format
+## Running it
 
-Your Excel file should contain columns:
-- **Course Name**: Name of the course/event
-- **Start Date**: Course start date (YYYY-MM-DD format)
-- **End Date**: Course end date (YYYY-MM-DD format)
-- **Program Name**: Program or department name
-
-## 🛠️ Usage
-
-### Send Calendar Invitations
+Hosted on Fly.io (Toronto, always on, data on a persistent volume at `/data`).
 
 ```bash
-python3 send_professional_calendar_invite.py
+export PATH="$HOME/.fly/bin:$PATH"
+./scripts/deploy_fly.sh                                                  # test and deploy
+fly secrets set APP_PASSWORD='new-site-password' --app chhavi-reminders  # website login
+fly logs --app chhavi-reminders                                          # what it's doing
 ```
 
-This will:
-- Generate a comprehensive calendar file (.ics) from your Excel data
-- Send professional emails with detailed instructions
-- Include instructions for Google Calendar, Outlook, Apple Calendar, etc.
+Keep it at one machine (`fly scale count 1`), since the email sender runs inside the web process.
 
-### Run Reminder System
-
-**One-time check:**
-```bash
-python3 run_reminder.py
-```
-
-**Continuous monitoring:**
-```bash
-python3 email_reminder_system.py
-```
-
-### Set Up Daily Automation
+Local development:
 
 ```bash
-python3 setup_automation.py
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+.venv/bin/python app.py            # http://127.0.0.1:5055
+.venv/bin/python -m pytest
 ```
 
-This will:
-- Set up daily cron job (runs at 9:00 AM)
-- Configure automatic reminder checking
-- Set up logging
+## Files
 
-## 📅 Reminder Schedule
-
-The system automatically sends reminders:
-
-| Timing | Description |
-|--------|-------------|
-| 14 days before | Early notification for course preparation |
-| 7 days before | Week-before reminder |
-| 2 days before | Final preparation reminder |
-| 1 day before | Last-minute reminder |
-| 14 days after | Follow-up reminder |
-
-## 📧 Email Features
-
-### Calendar Invitations
-- Professional email formatting
-- Detailed instructions for all major calendar applications
-- Complete course schedule with start/end dates
-- Easy import process for recipients
-
-### Reminder Emails
-- Course-specific information
-- Program details
-- Start and end dates
-- Professional formatting
-
-## 🔧 File Structure
-
-```
-email-automation/
-├── .gitignore                           # Excludes sensitive files
-├── create_calendar_invite.py            # Calendar creation functionality
-├── email_reminder_system.py             # Main reminder system
-├── run_reminder.py                      # Simple reminder runner
-├── send_professional_calendar_invite.py # Professional calendar emails
-├── setup_automation.py                  # Automation setup
-├── data/                                # Course schedule Excel files
-│   └── your_schedule.xlsx
-├── README.md                            # This file
-└── requirements.txt                     # Python dependencies
-```
-
-## 🔒 Security
-
-- **Configuration files** with sensitive data are excluded from version control
-- **Log files** are excluded to prevent information leakage
-- **Generated files** are excluded as they can be regenerated
-- **Python cache files** are excluded
-
-## 📝 Logging
-
-All system activity is logged to `email_reminder.log`:
-- Reminder sending status
-- Error messages
-- System operations
-- Daily check results
-
-## 🛠️ Troubleshooting
-
-### Common Issues
-
-1. **SMTP Authentication Error**
-   - Check email credentials in `email_config.json`
-   - Ensure 2-factor authentication is properly configured
-   - Verify SMTP server settings
-
-2. **Excel File Not Found**
-   - Check file path in `email_config.json`
-   - Ensure Excel file exists in `data/` directory
-   - Verify file permissions
-
-3. **No Reminders Sent**
-   - Check if courses have valid start/end dates
-   - Verify reminder timing (system only sends on specific days)
-   - Check log file for error messages
-
-### Manual Testing
-
-Test the system manually:
-```bash
-python3 run_reminder.py
-```
-
-Check logs:
-```bash
-tail -f email_reminder.log
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## 📄 License
-
-This project is open source and available under the MIT License.
-
-## 📞 Support
-
-For issues and questions:
-- Check the troubleshooting section
-- Review log files for error messages
-- Create an issue in the GitHub repository
-
----
-
-**Note**: This system is designed for educational and professional use. Ensure compliance with your organization's email policies and data protection regulations.
+| File | What it does |
+|------|--------------|
+| `app.py` | The website |
+| `catalog.py` | Reads courses, sessions and programs from extendedlearning.ubc.ca |
+| `scheduler.py` | Schedules reminders and sends the ones that are due |
+| `reminder_logic.py` | Reminder times and the email text |
+| `mailer.py` | Sends through UBC SMTP (`smtp.mail.ubc.ca:587`) |
+| `schedule_parser.py` | Date/time parsing used when reading course pages |
+| `db.py` | SQLite storage |
+| `legacy/` | The original Excel-driven scripts |

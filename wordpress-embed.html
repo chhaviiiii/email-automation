@@ -1,0 +1,42 @@
+<!--
+  Course Reminders: paste everything below into a WordPress "Custom HTML" block.
+
+  1. In https://sites.olt.ubc.ca/wp-admin, go to Pages > Add New (or edit an existing page).
+  2. Click "+" > search "Custom HTML" > add the block.
+  3. Paste this whole snippet into the block and click Preview.
+  4. Publish / Update.
+
+  If the preview shows only the button (no embedded app), UBC CMS removed the iframe for your role.
+  The button still works: it opens Course Reminders in a new tab. To get the embedded version,
+  ask UBC CMS support (LT Hub) to allow an iframe from https://chhavi-reminders.fly.dev.
+-->
+<div class="course-reminders-embed" style="max-width:1000px;margin:0 auto;">
+  <iframe
+    id="course-reminders-frame"
+    src="https://chhavi-reminders.fly.dev/"
+    title="UBC Extended Learning Course Reminders"
+    style="width:100%;height:1400px;border:0;display:block;"
+    loading="lazy"
+    allow="clipboard-write"
+    referrerpolicy="strict-origin-when-cross-origin"></iframe>
+
+  <p style="text-align:center;margin:16px 0;">
+    <a href="https://chhavi-reminders.fly.dev/" target="_blank" rel="noopener"
+       style="display:inline-block;background:#0055B7;color:#fff;padding:12px 22px;border-radius:4px;font-weight:600;text-decoration:none;">
+      Open Course Reminders in a new tab
+    </a>
+  </p>
+  <p style="text-align:center;font-size:14px;color:#5f6b7a;margin:0 0 16px;">
+    Sign in with your UBC email to get reminders before Extended Learning courses start.
+    If the sign-in doesn't stay on this page (some browsers block it inside embedded pages), use the button above.
+  </p>
+</div>
+
+<!-- Optional: resizes the embedded app to fit its content. WordPress may remove this script; the fixed height above still works. -->
+<script>
+  window.addEventListener('message', function (e) {
+    if (e.origin !== 'https://chhavi-reminders.fly.dev' || !e.data || e.data.type !== 'course-reminders-height') return;
+    var frame = document.getElementById('course-reminders-frame');
+    if (frame) frame.style.height = Math.max(600, e.data.height + 20) + 'px';
+  });
+</script>

@@ -1,15 +1,18 @@
 # Email configuration (contains sensitive credentials)
 email_config.json
 
+# Local data: events, settings and logs
+reminders.db
+reminders.db-*
+*.log
+
 # Python cache files
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 .Python
-
-# Log files
-*.log
+.pytest_cache/
 
 # Generated calendar files
 *.ics
@@ -25,6 +28,10 @@ __pycache__/
 Thumbs.db
 
 # Virtual environment
+.venv/
 venv/
 env/
 .env
+data/*.xlsx
+data/*.numbers
+ui-screenshots/
