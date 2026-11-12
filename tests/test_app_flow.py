@@ -246,7 +246,7 @@ def test_add_course_turns_reminders_on(client):
                                              "offsets": "14d, 2d"}, follow_redirects=True)
     page = resp.get_data(as_text=True)
     assert "Reminders are on for Health Data and Visualization (2 upcoming sessions)" in page
-    assert "Program: Health Data" in page
+    assert 'name="program" value="Health Data"' in page and page.count("Program: Health Data") == 0
 
     with client.db.get_db() as conn:
         events = conn.execute("SELECT * FROM events ORDER BY start_date").fetchall()

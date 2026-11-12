@@ -116,8 +116,8 @@ table.el-table { width: 100%; border-collapse: collapse; table-layout: fixed; fo
 .picker tr[hidden], .courses tr[hidden] { display: none; }
 .picker tbody tr { cursor: pointer; }
 
-.c-toggle { width: 44px; } .c-name { width: 34%; } .c-session { width: 22%; } .c-next { width: 20%; }
-.c-status { width: 11%; } .c-more { width: 10%; }
+.c-toggle { width: 44px; } .c-name { width: 42%; } .c-session { width: 25%; } .c-next { width: 22%; } .c-more { width: 11%; }
+.owner { font-weight: 400; color: var(--muted); font-size: 13px; margin-top: 2px; }
 .picker .c-name { width: 46%; } .c-format { width: 14%; } .c-date { width: 18%; }
 
 .expand { width: 22px; height: 22px; border: 0; padding: 0; background: none; position: relative; margin-top: -1px; }
@@ -126,7 +126,6 @@ table.el-table { width: 100%; border-collapse: collapse; table-layout: fixed; fo
 .expand[aria-expanded="true"]::after { transform: rotate(0deg); }
 
 .courses tr.details > td { border-bottom: 1px solid var(--row-rule); padding-top: 0; padding-bottom: 18px; }
-.facts { list-style: none; margin: 0 0 12px; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 24px; color: var(--muted); font-size: 13.5px; }
 table.sessions { width: 100%; border-collapse: collapse; margin: 4px 0 14px; font-size: 14px; background: #fff; }
 .sessions th { text-align: left; font-size: 13px; font-weight: 700; color: var(--navy); padding: 6px 10px; border-bottom: 2px solid var(--navy); }
 .sessions td { padding: 7px 10px; border-bottom: 1px solid var(--row-rule); }
@@ -180,7 +179,6 @@ table.sessions { width: 100%; border-collapse: collapse; margin: 4px 0 14px; fon
   .hint { margin-left: 0; }
   .edit-form { grid-template-columns: 1fr; }
   .c-session, .courses th:nth-child(3), .courses tbody.course > tr.row > td:nth-child(3) { display: none; }
-  .c-status, .courses th:nth-child(5), .courses tbody.course > tr.row > td:nth-child(5) { display: none; }
   .c-name { width: 48%; } .c-next { width: 30%; } .c-more { width: 22%; }
   .c-format, .picker th:nth-child(3), .picker td:nth-child(3) { display: none; }
   .picker .c-name { width: 52%; } .c-date { width: 28%; }
