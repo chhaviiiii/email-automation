@@ -2,78 +2,75 @@
 
 {% macro csrf() %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endmacro %}
 
-{% macro course_block(item, show_owner=false) %}
-{% set c = item.course %}
-<article class="course">
-  <header class="course-head">
-    <div>
-      <h3>
-        {% if c.url %}<a href="{{ c.url }}" target="_blank" rel="noopener">{{ c.title or c.course_code }}</a>
-        {% else %}{{ c.title or c.course_code }}{% endif %}
-        <span class="code">{{ c.course_code }}</span>
-      </h3>
-      <p class="course-meta">
-        {% if show_owner %}<span>Owner: {{ c.owner }}</span>{% endif %}
-        <span>Program: {{ c.program or 'N/A' }}</span>
-        <span>To: {{ c.recipients }}</span>
-        <span>Reminders: {{ c.offsets }} before</span>
-      </p>
-    </div>
-    <div class="course-actions">
-      <button type="button" class="text-button" aria-expanded="false"
-              onclick="toggleEdit(this)">Edit</button>
-      <form method="post" action="{{ url_for('remove_course', code=c.course_code) }}" class="inline"
-            onsubmit="return confirm('Stop all reminders for this course?')">
-        {{ csrf() }}<input type="hidden" name="owner" value="{{ c.owner }}">
-        <button class="text-button danger">Remove</button>
-      </form>
-    </div>
-  </header>
-
-  <form method="post" action="{{ url_for('edit_course', code=c.course_code) }}" class="edit-form" hidden>
-    {{ csrf() }}<input type="hidden" name="owner" value="{{ c.owner }}">
-    <label>Send to<input name="recipients" value="{{ c.recipients }}"></label>
-    <label>Reminders<input name="offsets" value="{{ c.offsets }}"></label>
-    <label>Program name in email<input name="program" value="{{ c.program }}"></label>
-    <div class="edit-buttons">
-      <button class="primary">Save</button>
-      <button type="button" class="secondary" onclick="toggleEdit(this.closest('.course').querySelector('[aria-expanded]'))">Cancel</button>
-    </div>
-  </form>
-
-  {% if item.sessions %}
-  <table class="sessions">
-    <colgroup><col class="c-when"><col class="c-code"><col class="c-next"><col class="c-act"></colgroup>
-    <thead><tr><th>Session</th><th>Section</th><th>Next reminder</th><th><span class="sr-only">Actions</span></th></tr></thead>
-    <tbody>
-    {% for s in item.sessions %}
-    {% set e = s.event %}
+{% macro course_table(items, show_owner=false) %}
+<table class="courses">
+  <colgroup><col class="c-course"><col class="c-when"><col class="c-next"><col class="c-act"></colgroup>
+  <thead><tr><th>Course</th><th>Session</th><th>Next reminder</th><th><span class="sr-only">Actions</span></th></tr></thead>
+  {% for item in items %}
+  {% set c = item.course %}
+  {% set rows = item.sessions or [none] %}
+  <tbody class="course">
+    {% for s in rows %}
     <tr>
+      {% if loop.first %}
+      <td class="course-cell" rowspan="{{ rows | length }}">
+        <div class="course-name">
+          {% if c.url %}<a href="{{ c.url }}" target="_blank" rel="noopener">{{ c.title or c.course_code }}</a>
+          {% else %}{{ c.title or c.course_code }}{% endif %}
+        </div>
+        <div class="course-meta" title="{{ ('Owner: ' ~ c.owner ~ ' · ') if show_owner }}To: {{ c.recipients }} · {{ c.offsets }} before · Program: {{ c.program or 'N/A' }}">
+          {% if show_owner %}<span>Owner: {{ c.owner }}</span>{% endif %}
+          <span>To: {{ c.recipients }}</span>
+          <span>{{ c.offsets }} before</span>
+          <span>Program: {{ c.program or 'N/A' }}</span>
+        </div>
+        <div class="course-actions">
+          <button type="button" class="text-button" aria-expanded="false" onclick="toggleEdit(this)">Edit</button>
+          <form method="post" action="{{ url_for('remove_course', code=c.course_code) }}" class="inline"
+                onsubmit="return confirm('Stop all reminders for this course?')">
+            {{ csrf() }}<input type="hidden" name="owner" value="{{ c.owner }}">
+            <button class="text-button danger">Remove</button>
+          </form>
+        </div>
+      </td>
+      {% endif %}
+      {% if s %}
+      {% set e = s.event %}
       <td class="nowrap">{{ e | daterange }}</td>
-      <td class="muted">{{ e.source_key }}</td>
       <td>
         {% if s.failed %}
-          <span class="status-failed">Failed to send</span>
+          <span class="status-failed">Failed</span>
           <form method="post" action="{{ url_for('retry_reminder', reminder_id=s.failed[0].id) }}" class="inline">{{ csrf() }}<button class="text-button">Retry</button></form>
-        {% elif s.next %}
-          {{ s.next.send_at | day }}, {{ s.next.send_at | time12 }}
-        {% else %}
-          <span class="muted">None left</span>
-        {% endif %}
+        {% elif s.next %}{{ s.next.send_at | day }}, {{ s.next.send_at | time12 }}
+        {% else %}<span class="muted">None left</span>{% endif %}
         {% if s.sent %}<span class="muted"> · {{ s.sent }} sent</span>{% endif %}
       </td>
       <td class="right">
         <form method="post" action="{{ url_for('remove_session', event_id=e.id) }}" class="inline"
               onsubmit="return confirm('Stop reminders for this session only?')">{{ csrf() }}<button class="text-button muted">Skip</button></form>
       </td>
+      {% else %}
+      <td colspan="3" class="muted">No dates posted yet</td>
+      {% endif %}
     </tr>
     {% endfor %}
-    </tbody>
-  </table>
-  {% else %}
-  <p class="muted small">No dates posted yet. Reminders start once Extended Learning lists a session.</p>
-  {% endif %}
-</article>
+    <tr class="edit-row" hidden>
+      <td colspan="4">
+        <form method="post" action="{{ url_for('edit_course', code=c.course_code) }}" class="edit-form">
+          {{ csrf() }}<input type="hidden" name="owner" value="{{ c.owner }}">
+          <label>Send to<input name="recipients" value="{{ c.recipients }}"></label>
+          <label>Reminders<input name="offsets" value="{{ c.offsets }}"></label>
+          <label>Program name in email<input name="program" value="{{ c.program }}"></label>
+          <div class="edit-buttons">
+            <button class="primary">Save</button>
+            <button type="button" class="secondary" onclick="toggleEdit(this.closest('.course').querySelector('[aria-expanded]'))">Cancel</button>
+          </div>
+        </form>
+      </td>
+    </tr>
+  </tbody>
+  {% endfor %}
+</table>
 {% endmacro %}
 
 {% block content %}
@@ -101,13 +98,12 @@
 
 <section class="overview" aria-label="Summary">
   {% set nd = stats.next_detail %}
-  <p class="overview-label">Next reminder:</p>
-  {% if nd %}
-    <p class="overview-next"><strong>{{ nd.send_at | day }} at {{ nd.send_at | time12 }}</strong></p>
-    <p class="overview-what">{{ nd.title }} <span class="muted">· {{ nd.offset_label }}</span></p>
-  {% else %}
-    <p class="overview-next">Nothing scheduled yet</p>
-  {% endif %}
+  <p class="overview-next">
+    <span class="muted">Next reminder:</span>
+    {% if nd %}<strong>{{ nd.send_at | day }}, {{ nd.send_at | time12 }}</strong>
+      <span class="overview-what">{{ nd.title }} <span class="muted">({{ nd.offset_label }})</span></span>
+    {% else %}<strong>none scheduled</strong>{% endif %}
+  </p>
   <p class="overview-counts">
     <span>{{ stats.courses }} course{{ '' if stats.courses == 1 else 's' }}</span>
     <span>{{ stats.scheduled }} email{{ '' if stats.scheduled == 1 else 's' }} scheduled</span>
@@ -130,9 +126,9 @@
 <section class="section" aria-labelledby="your-courses">
   <h2 id="your-courses" class="section-title">Your courses</h2>
   {% if not my_courses %}
-    <p class="muted">Nothing here yet. Courses you add below will show up here with their reminder dates.</p>
+    <p class="muted small">Nothing here yet. Courses you add below show up here.</p>
   {% endif %}
-  {% for item in my_courses %}{{ course_block(item) }}{% endfor %}
+  {% if my_courses %}{{ course_table(my_courses) }}{% endif %}
 </section>
 
 <section class="section" aria-labelledby="add">
@@ -149,8 +145,7 @@
     <label>Reminders<input name="offsets" value="{{ settings.default_offsets }}"></label>
     <button class="primary" id="add-button">Add</button>
   </div>
-  <p class="hint">Separate emails with commas. <code>14d</code> means 14 days before the start date; you can also use
-    <code>1w</code>, <code>2h</code>, or <code>14d after</code> for a follow-up once the course ends.</p>
+  <p class="hint">Separate emails with commas. <code>14d</code> = 14 days before the start date.</p>
 
   <div class="picker">
     <div class="picker-top">
@@ -182,7 +177,7 @@
 {% if others %}
 <section class="section" aria-labelledby="others">
   <h2 id="others" class="section-title">Everyone else's courses</h2>
-  {% for item in others %}{{ course_block(item, show_owner=true) }}{% endfor %}
+  {{ course_table(others, show_owner=true) }}
 </section>
 {% endif %}
 
@@ -208,9 +203,10 @@
 
 <script>
 function toggleEdit(button) {
-  const form = button.closest('.course').querySelector('.edit-form');
-  const open = form.hidden;
-  form.hidden = !open;
+  const row = button.closest('.course').querySelector('.edit-row');
+  const form = row.querySelector('.edit-form');
+  const open = row.hidden;
+  row.hidden = !open;
   button.setAttribute('aria-expanded', String(open));
   if (open) form.querySelector('input:not([type=hidden])').focus();
 }
