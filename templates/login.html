@@ -2,7 +2,7 @@
 {% block content %}
 <div class="signin">
   {% if pending %}
-    <h1>Check your email</h1>
+    <h1 class="page-title">Check your email</h1>
     <p class="lead">We sent a 6-digit code to <strong>{{ pending }}</strong>.</p>
     <p class="muted small">It can take a minute to arrive, so check your junk folder too. You can also click the link in the email.</p>
     <form method="post" action="{{ url_for('login_verify') }}" class="signin-form">
@@ -10,21 +10,21 @@
       <label for="code">Code</label>
       <input id="code" class="code-input" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="7"
              pattern="[0-9 ]*" placeholder="000000" required autofocus>
-      <button class="primary wide">Sign in</button>
+      <button class="btn wide">Sign in</button>
     </form>
     <div class="signin-links">
       <form method="post" action="{{ url_for('login_resend') }}" class="inline">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <button class="text-button">Resend code</button>
+        <button class="link">Resend code</button>
       </form>
       <form method="post" action="{{ url_for('login_restart') }}" class="inline">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <button class="text-button">Change email</button>
+        <button class="link">Change email</button>
       </form>
     </div>
     <p class="muted small">{{ 'You’ll stay signed in on this device for 90 days.' if pending_remember else 'You’ll be signed out when you close your browser.' }}</p>
   {% else %}
-    <h1>Sign in</h1>
+    <h1 class="page-title">Sign in</h1>
     <p class="lead">Course Reminders emails you before the UBC Extended Learning courses you care about start.</p>
 
     {% if email_ready %}
@@ -37,7 +37,7 @@
       <p class="field-note">Not you? <a href="{{ url_for('login_forget') }}">Use a different email</a></p>
       {% endif %}
       <label class="check"><input type="checkbox" name="remember" checked> Remember me on this device</label>
-      <button class="primary wide" {{ 'autofocus' if last_email }}>Email me a sign-in code</button>
+      <button class="btn wide" {{ 'autofocus' if last_email }}>Email me a sign-in code</button>
     </form>
     <p class="muted small">No password needed. Use your {{ '@' ~ domains | join(', @') }} address. You'll only see your own reminders.</p>
     {% else %}
@@ -63,7 +63,7 @@
       <label for="admin-password">Password</label>
       <input id="admin-password" type="password" name="password" autocomplete="current-password" required>
       <label class="check"><input type="checkbox" name="remember" checked> Remember me on this device</label>
-      <button class="secondary wide">Sign in as administrator</button>
+      <button class="btn-secondary wide">Sign in as administrator</button>
     </form>
   </details>
   {% endif %}

@@ -4,6 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Course Reminders · UBC Extended Learning</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <script>if (window.self !== window.top) document.documentElement.classList.add('embedded');</script>
 </head>
@@ -13,21 +16,22 @@
     <div class="ubc-bar"><div class="wrap">The University of British Columbia</div></div>
     <div class="app-bar">
       <div class="wrap app-bar-inner">
-        <a class="app-name" href="{{ url_for('index') }}">Course Reminders <span>Extended Learning</span></a>
+        <a class="app-name" href="{{ url_for('index') }}">Extended Learning <span>Course Reminders</span></a>
         {% if user %}
         <div class="account">
           <span class="account-email">{{ user }}</span>
           {% if admin %}<span class="account-role">Admin</span>{% endif %}
           <form method="post" action="{{ url_for('logout') }}" class="inline">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <button class="text-button">Sign out</button>
+            <button class="link">Sign out</button>
           </form>
         </div>
         {% endif %}
       </div>
     </div>
   </header>
-  <main class="wrap" id="main">
+  <div class="band" aria-hidden="true"></div>
+  <main class="wrap panel" id="main">
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% for category, message in messages %}
         <div class="notice {{ category }}" role="{{ 'alert' if category == 'error' else 'status' }}">{{ message }}</div>

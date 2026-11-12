@@ -277,6 +277,12 @@ def format_time12(value):
     return f"{value.hour % 12 or 12}:{value.minute:02d} {'AM' if value.hour < 12 else 'PM'}" if value else ""
 
 
+@app.template_filter("startdate")
+def format_startdate(value):
+    d = date.fromisoformat(value)
+    return f"{d:%b} {d.day}, {d.year}"
+
+
 @app.template_filter("daterange")
 def format_daterange(row):
     start = date.fromisoformat(row["start_date"])
