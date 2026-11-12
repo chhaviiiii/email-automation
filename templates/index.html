@@ -3,17 +3,19 @@
 {% macro csrf() %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endmacro %}
 
 {% macro course_table(items, show_owner=false) %}
-<table class="el-table courses">
+<table class="el-table courses sortable">
   <colgroup><col class="c-toggle"><col class="c-name"><col class="c-session"><col class="c-next"><col class="c-more"><col class="c-remove"></colgroup>
   <thead>
-    <tr><th><span class="sr-only">Expand</span></th><th>Course name</th><th>Next session</th><th>Next reminder</th><th>More</th><th><span class="sr-only">Remove</span></th></tr>
+    <tr><th><span class="sr-only">Expand</span></th><th aria-sort="none"><button type="button" class="sort" data-key="name">Course name</button></th><th aria-sort="none"><button type="button" class="sort" data-key="session">Next session</button></th><th aria-sort="none"><button type="button" class="sort" data-key="next">Next reminder</button></th><th>More</th><th><span class="sr-only">Remove</span></th></tr>
   </thead>
   {% for item in items %}
   {% set c = item.course %}
   {% set sessions = item.sessions %}
   {% set pending = sessions | selectattr('next') | map(attribute='next') | map(attribute='send_at') | sort | list %}
   {% set failed = sessions | selectattr('failed') | list %}
-  <tbody class="course">
+  <tbody class="course" data-name="{{ (c.title or c.course_code) | lower }}"
+         data-session="{{ sessions[0].event.start_date if sessions else '9999' }}"
+         data-next="{{ pending[0] if pending else '9999' }}">
     <tr class="row">
       <td><button type="button" class="expand" aria-expanded="false" aria-label="Show details for {{ c.title or c.course_code }}" onclick="toggleRow(this)"></button></td>
       <td class="name">{{ c.title or c.course_code }}{% if show_owner %}<div class="owner">Owner: {{ c.owner }}</div>{% endif %}</td>
@@ -158,14 +160,15 @@
     </label>
   </div>
 
-  <table class="el-table picker">
+  <table class="el-table picker sortable">
     <colgroup><col class="c-toggle"><col class="c-name"><col class="c-format"><col class="c-date"><col class="c-more"></colgroup>
-    <thead><tr><th><span class="sr-only">Select</span></th><th>Course name</th><th>Format</th><th>Next Start Date</th><th>More</th></tr></thead>
+    <thead><tr><th><span class="sr-only">Select</span></th><th aria-sort="none"><button type="button" class="sort" data-key="name">Course name</button></th><th aria-sort="none"><button type="button" class="sort" data-key="format">Format</button></th><th aria-sort="none"><button type="button" class="sort" data-key="date">Next Start Date</button></th><th>More</th></tr></thead>
     <tbody id="course-list">
       {% for item in available %}
       {% set c = item.course %}
       <tr class="option" data-search="{{ (c.title ~ ' ' ~ c.code ~ ' ' ~ c.program) | lower }}"
-          data-format="{{ c.format | lower }}" data-upcoming="{{ 1 if item.sessions else 0 }}">
+          data-format="{{ c.format | lower }}" data-upcoming="{{ 1 if item.sessions else 0 }}"
+          data-name="{{ c.title | lower }}" data-date="{{ item.sessions[0].start_date if item.sessions else '9999' }}">
         <td><input type="checkbox" name="course" value="{{ c.code }}" id="pick-{{ c.code }}"></td>
         <td class="name"><label for="pick-{{ c.code }}">{{ c.title }}</label></td>
         <td>{{ c.format }}</td>
@@ -210,6 +213,23 @@
 {% endif %}
 
 <script>
+document.querySelectorAll('table.sortable').forEach(table => {
+  const body = table.querySelector('#course-list') || table;
+  const items = () => [...body.children].filter(el => el.matches(table.classList.contains('picker') ? 'tr' : 'tbody'));
+  table.querySelectorAll('button.sort').forEach(button => {
+    button.addEventListener('click', () => {
+      const th = button.closest('th');
+      const dir = th.getAttribute('aria-sort') === 'ascending' ? 'descending' : 'ascending';
+      table.querySelectorAll('th[aria-sort]').forEach(h => h.setAttribute('aria-sort', 'none'));
+      th.setAttribute('aria-sort', dir);
+      const key = button.dataset.key;
+      const sign = dir === 'ascending' ? 1 : -1;
+      items().sort((a, b) => sign * (a.dataset[key] || '').localeCompare(b.dataset[key] || '') ||
+                              (a.dataset.name || '').localeCompare(b.dataset.name || ''))
+             .forEach(el => body.appendChild(el));
+    });
+  });
+});
 function toggleRow(button) {
   const details = button.closest('tbody').querySelector('.details');
   const open = details.hidden;

@@ -109,6 +109,15 @@ table.el-table { width: 100%; border-collapse: collapse; table-layout: fixed; fo
 .el-table > thead th { text-align: left; font-weight: 700; color: var(--navy); font-size: 14px;
   padding: 10px 12px; border-bottom: 3px solid var(--navy); }
 .el-table > tbody > tr > td, .el-table > tbody.course > tr > td { padding: 12px; vertical-align: top; border-bottom: 1px solid var(--row-rule); }
+.sort { background: none; border: 0; padding: 0; font: inherit; font-weight: 700; color: var(--navy); cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px; text-align: left; }
+.sort::after { content: ""; width: 10px; height: 10px; flex: none; opacity: 0.45; background: no-repeat center / contain
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M5 0l3 4H2zM5 10l3-4H2z' fill='%23002145'/%3E%3C/svg%3E"); }
+th[aria-sort="ascending"] .sort::after { opacity: 1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M5 1l4 6H1z' fill='%23002145'/%3E%3C/svg%3E"); }
+th[aria-sort="descending"] .sort::after { opacity: 1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M5 9l4-6H1z' fill='%23002145'/%3E%3C/svg%3E"); }
+.sort:hover { color: var(--blue); }
 .el-table .name { font-weight: 700; color: var(--navy); }
 .el-table .name label { font-size: inherit; color: inherit; cursor: pointer; }
 .el-table td:first-child, .el-table th:first-child { padding-left: 14px; padding-right: 0; }
